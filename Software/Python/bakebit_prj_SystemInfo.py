@@ -43,6 +43,17 @@ import multiprocessing
 import platform
 import socket
 import bakebit_128_64_oled as oled
+import socket
+import fcntl
+import struct
+
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15])
+    )[20:24])
 
 oled.init()                  #initialze SEEED OLED display
 oled.clearDisplay()          #clear the screen and set start position to top left corner
@@ -58,7 +69,7 @@ memUsage = psutil.phymem_usage()
 diskUsage = psutil.disk_usage('/')
 
 oled.setTextXY(0,0)
-oled.putString("%s" % socket.gethostbyname(socket.gethostname()))
+oled.putString("%s" % get_ip_address('eth0'))
 
 oled.setTextXY(0,1)
 oled.putString("Mem:%s" % filesizeformat(memUsage.total))
@@ -86,7 +97,7 @@ memUsage = psutil.phymem_usage()
 diskUsage = psutil.disk_usage('/')
 
 oled.setTextXY(0,0)
-oled.putString("%s" % socket.gethostbyname(socket.gethostname()))
+oled.putString("%s" % get_ip_address('eth0'))
 
 oled.setTextXY(0,1)
 oled.putString("Mem:%s" % filesizeformat(memUsage.total))
