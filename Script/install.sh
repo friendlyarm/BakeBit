@@ -42,6 +42,10 @@ if [ ${USER_ID} -ne 0 ]; then
     echo "Please run this as root."
     exit 1
 fi
+echo ""
+echo " Checking For Updates  "
+sudo apt-get update --yes
+echo "======================="
 
 echo " "
 echo "Installing Dependencies"
