@@ -35,18 +35,45 @@ import math
 
 buzzer_pin = 3		#Port for buzzer
 button = 4		#Port for Button
-
+old_button_status = -1
 pinMode(buzzer_pin,"OUTPUT")	# Assign mode for buzzer as output
 pinMode(button,"INPUT")		# Assign mode for Button as input
+
+buzzer_on = False
+old_buzzer_on = not buzzer_on
+button_pressed = False
+
 while True:
 	try:
-		button_status= digitalRead(button)	#Read the Button status
-		if button_status:	#If the Button is in HIGH position, run the program
-			analogWrite(buzzer_pin,0)						
-			print "\tOff"			
-		else:		#If Button is in Off position, print "Off" on the screen
-			analogWrite(buzzer_pin,127)
-			print "Buzzing"			
+		while True:
+			button_status = digitalRead(button)	#Read the Button status
+			# print button_status
+			if old_button_status < 0: 
+				break
+
+			if button_status != old_button_status:
+				break
+
+		time.sleep(0.2)
+		old_button_status = button_status
+
+		if button_status == 0:
+			button_pressed = True
+		else:
+			if button_pressed:
+				buzzer_on = not buzzer_on
+			button_pressed = False 
+
+		if old_buzzer_on != buzzer_on:
+			old_buzzer_on = buzzer_on
+			if buzzer_on:
+				analogWrite(buzzer_pin,127)
+				print "Buzzing"
+			else:
+				analogWrite(buzzer_pin,0)
+				print "\tOff"			
+			
+		time.sleep(0.2)			
 	except KeyboardInterrupt:	# Stop the buzzer before stopping
 		digitalWrite(buzzer_pin,0)
 		break
