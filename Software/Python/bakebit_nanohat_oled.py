@@ -41,6 +41,7 @@ from PIL import ImageDraw
 import time
 import sys
 import subprocess
+import threading
 import signal
 import os
 
@@ -78,6 +79,9 @@ fontb14 = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 14);
 global font11
 font11 = ImageFont.truetype('DejaVuSansMono.ttf', 11);
 
+global lock
+lock = threading.Lock()
+
 def draw_page():
     global drawing
     global image
@@ -93,8 +97,20 @@ def draw_page():
     global showPageIndicator
     global width
     global height
+    global lock
 
+    lock.acquire()
+    is_drawing = drawing
+    page_index = pageIndex
+    lock.release()
+
+    if is_drawing:
+        return
+
+    lock.acquire()
     drawing = True
+    lock.release()
+    
     # Draw a black filled box to clear the image.            
     draw.rectangle((0,0,width,height), outline=0, fill=0)
     # Draw current page indicator
@@ -104,20 +120,20 @@ def draw_page():
         dotX=width-dotWidth-1
         dotTop=(height-pageCount*dotWidth-(pageCount-1)*dotPadding)/2
         for i in range(pageCount):
-            if i==pageIndex:
+            if i==page_index:
                 draw.rectangle((dotX, dotTop, dotX+dotWidth, dotTop+dotWidth), outline=255, fill=255)
             else:
                 draw.rectangle((dotX, dotTop, dotX+dotWidth, dotTop+dotWidth), outline=255, fill=0)
             dotTop=dotTop+dotWidth+dotPadding
 
-    if pageIndex==0:
+    if page_index==0:
         text = time.strftime("%A")
         draw.text((2,2),text,font=font14,fill=255)
         text = time.strftime("%e %b %Y")
         draw.text((2,18),text,font=font14,fill=255)
         text = time.strftime("%X")
         draw.text((2,40),text,font=fontb24,fill=255)
-    elif pageIndex==1:
+    elif page_index==1:
         # Draw some shapes.
         # First define some constants to allow easy resizing of shapes.
         padding = 2
@@ -142,7 +158,7 @@ def draw_page():
         draw.text((x, top+5+24),    str(MemUsage),  font=smartFont, fill=255)
         draw.text((x, top+5+36),    str(Disk),  font=smartFont, fill=255)
         draw.text((x, top+5+48),    tempStr,  font=smartFont, fill=255)
-    elif pageIndex==3: #shutdown -- no
+    elif page_index==3: #shutdown -- no
         draw.text((2, 2),  'Shutdown?',  font=fontb14, fill=255)
 
         draw.rectangle((2,20,width-4,20+16), outline=0, fill=0)
@@ -151,7 +167,7 @@ def draw_page():
         draw.rectangle((2,38,width-4,38+16), outline=0, fill=255)
         draw.text((4, 40),  'No',  font=font11, fill=0)
 
-    elif pageIndex==4: #shutdown -- yes
+    elif page_index==4: #shutdown -- yes
         draw.text((2, 2),  'Shutdown?',  font=fontb14, fill=255)
 
         draw.rectangle((2,20,width-4,20+16), outline=0, fill=255)
@@ -160,57 +176,76 @@ def draw_page():
         draw.rectangle((2,38,width-4,38+16), outline=0, fill=0)
         draw.text((4, 40),  'No',  font=font11, fill=255)
 
-    elif pageIndex==5:
+    elif page_index==5:
         draw.text((2, 2),  'Shutting down',  font=fontb14, fill=255)
         draw.text((2, 20),  'Please wait',  font=font11, fill=255)
 
     oled.drawImage(image)
+
+    lock.acquire()
     drawing = False
+    lock.release()
+
+
+def is_showing_power_msgbox():
+    global pageIndex
+    lock.acquire()
+    page_index = pageIndex
+    lock.release()
+    if page_index==3 or page_index==4:
+        return True
+    return False
+
+
+def update_page_index(pi):
+    global pageIndex
+    lock.acquire()
+    pageIndex = pi
+    lock.release()
 
 def receive_signal(signum, stack):
     global pageIndex
-    global drawing
 
-    if pageIndex==5:
+    lock.acquire()
+    page_index = pageIndex
+    lock.release()
+
+    if page_index==5:
         return
 
     if signum == signal.SIGUSR1:
         print 'K1 pressed'
-        if pageIndex==3 or pageIndex==4:
-            if pageIndex==3:
-                pageIndex=4
+        if is_showing_power_msgbox():
+            if page_index==3:
+                update_page_index(4)
             else:
-                pageIndex=3
+                update_page_index(3)
             draw_page()
         else:
             pageIndex=0
-            if not drawing:
-                draw_page()
+            draw_page()
 
     if signum == signal.SIGUSR2:
         print 'K2 pressed'
-        if pageIndex==3 or pageIndex==4:
-            if pageIndex==4:
-                pageIndex=5
-                if not drawing:
-                    draw_page()
+        if is_showing_power_msgbox():
+            if page_index==4:
+                update_page_index(5)
+                draw_page()
  
             else:
-                pageIndex=0
+                update_page_index(0)
                 draw_page()
         else:
-            pageIndex=1
-            if not drawing:
-                draw_page()
+            update_page_index(1)
+            draw_page()
 
     if signum == signal.SIGALRM:
         print 'K3 pressed'
-        if pageIndex==3 or pageIndex==4:
-            pageIndex=0
-            if not drawing:
-                draw_page()
+        if is_showing_power_msgbox():
+            update_page_index(0)
+            draw_page()
         else:
-            pageIndex=3
+            update_page_index(3)
             draw_page()
 
 
@@ -225,9 +260,26 @@ signal.signal(signal.SIGALRM, receive_signal)
 while True:
     try:
         draw_page()
-        if pageIndex==5:
+
+        lock.acquire()
+        page_index = pageIndex
+        lock.release()
+
+        if page_index==5:
             time.sleep(2)
-            oled.clearDisplay()
+            while True:
+                lock.acquire()
+                is_drawing = drawing
+                lock.release()
+                if not is_drawing:
+                    lock.acquire()
+                    drawing = True
+                    lock.release()
+                    oled.clearDisplay()
+                    break
+                else:
+                    time.sleep(.1)
+                    continue
             time.sleep(1)
             os.system('systemctl poweroff')
             break
