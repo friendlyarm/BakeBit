@@ -39,7 +39,6 @@ THE SOFTWARE.
 import smbus
 import time
 import math
-import RPi.GPIO as GPIO
 import struct
 
 bus = smbus.SMBus(0)
