@@ -16,6 +16,7 @@ echo "   - i2c-tools        This Python module allows SMBus access through the I
 echo "   - python-smbus     Python bindings for Linux SMBus access through i2c-dev"
 echo "   - minicom          friendly menu driven serial communication program"
 echo "   - psutil           a cross-platform process and system utilities module for Python"
+echo "   - WiringNP         a GPIO access library for NanoPi NEO"
 echo " "
 echo " NanoPi will reboot after completion."
 echo " "
@@ -51,7 +52,12 @@ echo " "
 echo "Installing Dependencies"
 echo "======================="
 sudo apt-get install python2.7 -y
-sudo apt-get install python-pip git libi2c-dev python-serial i2c-tools python-smbus minicom python-dev -y
+sudo apt-get install python-pip git libi2c-dev python-serial i2c-tools python-smbus minicom python-dev libfreetype6-dev -y
+yes | sudo pip install --upgrade pip
+yes | sudo pip install image
+# yes | sudo pip uninstall pillow
+# yes | sudo pip install --no-cache-dir pillow
+yes | sudo pip install pillow
 
 if [ -d RPi.GPIO-0.5.11 ]; then
     cd RPi.GPIO-0.5.11
@@ -67,23 +73,23 @@ fi
 
 echo "Dependencies installed"
 
-if [ -d wiringPi ]; then
-    cd wiringPi
+if [ -d WiringNP ]; then
+    cd WiringNP
     git pull
 else
-    git clone git://git.drogon.net/wiringPi
-    cd wiringPi
+    git clone https://github.com/friendlyarm/WiringNP.git
+    cd WiringNP
 fi
 
-./build
+sudo ./build
 RES=$?
 
 if [ $RES -ne 0 ]; then
-  echo "Something went wrong building/installing wiringPi, exiting."
+  echo "Something went wrong building/installing WiringNP, exiting."
   exit 1
 fi
 
-echo "wiringPi Installed"
+echo "WiringNP Installed"
 
 sudo adduser ${USER_NAME} i2c
 

@@ -45,8 +45,10 @@ import struct
 bus = smbus.SMBus(0)
 address=0x3c
 addressingMode= None
-SeeedOLED_Max_X                 =127 #128 Pixels
-SeeedOLED_Max_Y                 =63  #64  Pixels
+SeeedOLED_Width			=128 #128 Pixels
+SeeedOLED_Height		=64  #64  Pixels
+SeeedOLED_Max_X                 =SeeedOLED_Width-1
+SeeedOLED_Max_Y                 =SeeedOLED_Height-1
                                 
 PAGE_MODE                       =01
 HORIZONTAL_MODE                 =02
@@ -194,6 +196,45 @@ def multi_comm(commands):
     for c in commands:
         sendCommand(c)
 
+def base_init():
+        sendCommand(0x00)    #set lower column address
+        sendCommand(0x10)    #set higher column address
+  
+        sendCommand(0x40)    #set display start line
+  
+        sendCommand(0xB0)    #set page address
+  
+        sendCommand(0x81)
+        sendCommand(0xCF)    #0~255????????????????
+  
+        sendCommand(0xA1)    #set segment remap
+  
+        sendCommand(0xA6)    #normal / reverse
+  
+        sendCommand(0xA8)    #multiplex ratio
+        sendCommand(0x3F)    #duty = 1/64
+  
+        sendCommand(0xC8)    #Com scan direction
+  
+        sendCommand(0xD3)    #set display offset
+        sendCommand(0x00);
+  
+        sendCommand(0xD5)    #set osc division
+        sendCommand(0x80);
+  
+        sendCommand(0xD9)    #set pre-charge period
+        sendCommand(0xF1);
+  
+        sendCommand(0xDA)    #set COM pins
+        sendCommand(0x12);
+  
+        sendCommand(0xDB)    #set vcomh
+        sendCommand(0x40);
+  
+        sendCommand(0x8D)    #set charge pump enable
+        sendCommand(0x14);
+  
+
 # Init function of the OLED
 def init():
         sendCommand(0xAE)    #display off
@@ -301,6 +342,33 @@ def putChar(C):
 def putString(s):
     for i in range(len(s)):
         putChar(s[i])
+
+def drawImage(image):
+    """Set buffer to value of Python Imaging Library image.  The image should
+    be in 1 bit mode and a size equal to the display size.
+    """
+    if image.mode != '1':
+        raise ValueError('Image must be in mode 1.')
+    imwidth, imheight = image.size
+    if imwidth != SeeedOLED_Width or imheight != SeeedOLED_Height:
+        raise ValueError('Image must be same dimensions as display ({0}x{1}).' \
+            .format(SeeedOLED_Width, SeeedOLED_Height))
+    # Grab all the pixels from the image, faster than getpixel.
+    pix = image.load()
+    # Iterate through the memory pages
+    index = 0
+    pages=SeeedOLED_Height/8
+    for page in range(pages):
+       # Iterate through all x axis columns.
+        for x in range(SeeedOLED_Width):
+           # Set the bits for the column of pixels at the current position.
+            bits = 0
+            # Don't use range here as it's a bit slow
+            for bit in [0, 1, 2, 3, 4, 5, 6, 7]:
+                bits = bits << 1
+                bits |= 0 if pix[(x, page*8+7-bit)] == 0 else 1
+	    sendData(bits)
+            index += 1
 		
 def putNumber(long_num):
 	char_buffer[10]=None
