@@ -152,7 +152,7 @@ def draw_page():
         tempI = int(open('/sys/class/thermal/thermal_zone0/temp').read());
         if tempI>1000:
             tempI = tempI/1000
-        tempStr = "CPU TEMP: %sF" % str(tempI)
+        tempStr = "CPU TEMP: %sC" % str(tempI)
         draw.text((x, top+5),       "IP: " + str(IP),  font=smartFont, fill=255)
         draw.text((x, top+5+12),     str(CPU), font=smartFont, fill=255)
         draw.text((x, top+5+24),    str(MemUsage),  font=smartFont, fill=255)
