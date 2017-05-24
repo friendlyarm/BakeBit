@@ -1,8 +1,8 @@
 ## **BakeBit**
 
-BakeBit is an open source platform for connecting BakeBit Sensors to the NanoPi NEO. It is based on the GrovePi.
+BakeBit is an open source platform for connecting BakeBit Sensors to the NanoPi NEO/NEO2. It is based on the GrovePi.
 
-Currently supported boards: NanoPi NEO, NanoPi Fire.
+Currently supported boards: NanoPi NEO, NanoPi NEO2, NanoPi NEO Air.
 
 ## License
 
