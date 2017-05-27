@@ -9,8 +9,6 @@ Software/Python/1.sh
 # Other
 Script/RPi.GPIO-0.5.11/build
 *.swp
-Firmware/Source/v1.2/grove_pi_v1_2_6/grove_pi_v1_2_6.ino.standard.hex
-Firmware/Source/v1.2/grove_pi_v1_2_6/grove_pi_v1_2_6.ino.with_bootloader.standard.hex
 
 # Folder config file
 Desktop.ini
