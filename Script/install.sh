@@ -4,12 +4,14 @@ echo " "
 echo "Requirements:"
 echo "1) Must be connected to the internet"
 echo "2) This script must be run as root user"
+echo "3) Must synchronize time, if not it may lead to the failure of SSL authentication and download failed."
 echo " "
 echo "Steps:"
 echo "Installs package dependencies:"
 echo "   - python2.7        python2.7"
 echo "   - python-pip       alternative Python package installer"
 echo "   - git              fast, scalable, distributed revision control system"
+echo "   - libjpeg-dev      Libjpeg is a widely used C library for reading and writing JPEG image files."
 echo "   - libi2c-dev       userspace I2C programming library development files"
 echo "   - python-serial    pyserial - module encapsulating access for the serial port"
 echo "   - i2c-tools        This Python module allows SMBus access through the I2C /dev"
@@ -52,7 +54,7 @@ echo " "
 echo "Installing Dependencies"
 echo "======================="
 sudo apt-get install python2.7 -y
-sudo apt-get install python-pip git libi2c-dev python-serial i2c-tools python-smbus minicom python-dev libfreetype6-dev -y
+sudo apt-get install python-pip git libjpeg-dev libi2c-dev python-serial i2c-tools python-smbus minicom python-dev libfreetype6-dev -y
 yes | sudo pip install --upgrade pip
 yes | sudo pip install image
 # yes | sudo pip uninstall pillow
