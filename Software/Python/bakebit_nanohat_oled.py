@@ -153,7 +153,7 @@ def draw_page():
         if tempI>1000:
             tempI = tempI/1000
         tempStr = "CPU TEMP: %sC" % str(tempI)
-        draw.text((x, top+5),       "IP: " + str(IP),  font=smartFont, fill=255)
+        draw.text((x, top+5),       "IP: " + str(IP).strip(),  font=smartFont, fill=255)
         draw.text((x, top+5+12),     str(CPU), font=smartFont, fill=255)
         draw.text((x, top+5+24),    str(MemUsage),  font=smartFont, fill=255)
         draw.text((x, top+5+36),    str(Disk),  font=smartFont, fill=255)
