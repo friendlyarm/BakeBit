@@ -44,6 +44,7 @@ import subprocess
 import threading
 import signal
 import os
+import socket
 
 global width
 width=128
@@ -81,6 +82,18 @@ font11 = ImageFont.truetype('DejaVuSansMono.ttf', 11);
 
 global lock
 lock = threading.Lock()
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 def draw_page():
     global drawing
@@ -141,8 +154,7 @@ def draw_page():
         bottom = height-padding
         # Move left to right keeping track of the current x position for drawing shapes.
         x = 0
-        cmd = "hostname -I | cut -d\' \' -f1"
-        IP = subprocess.check_output(cmd, shell = True )
+	IPAddress = get_ip()
         cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
         CPU = subprocess.check_output(cmd, shell = True )
         cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
@@ -153,8 +165,9 @@ def draw_page():
         if tempI>1000:
             tempI = tempI/1000
         tempStr = "CPU TEMP: %sC" % str(tempI)
-        draw.text((x, top+5),       "IP: " + str(IP),  font=smartFont, fill=255)
-        draw.text((x, top+5+12),     str(CPU), font=smartFont, fill=255)
+
+        draw.text((x, top+5),       "IP: " + str(IPAddress),  font=smartFont, fill=255)
+        draw.text((x, top+5+12),    str(CPU), font=smartFont, fill=255)
         draw.text((x, top+5+24),    str(MemUsage),  font=smartFont, fill=255)
         draw.text((x, top+5+36),    str(Disk),  font=smartFont, fill=255)
         draw.text((x, top+5+48),    tempStr,  font=smartFont, fill=255)
