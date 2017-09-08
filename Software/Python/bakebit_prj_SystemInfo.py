@@ -65,7 +65,7 @@ def filesizeformat(value):
     exponent = int(log(value, 1024))
     return "%.1f %s" % (float(value) / pow(1024, exponent), byteunits[exponent])
 
-memUsage = psutil.phymem_usage()
+memUsage = psutil.virtual_memory()
 diskUsage = psutil.disk_usage('/')
 
 oled.setTextXY(0,0)
