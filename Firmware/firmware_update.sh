@@ -27,6 +27,6 @@ read -n1
 avrdude -c nanopineo -p m328p -U lfuse:w:0xFF:m
 avrdude -c nanopineo -p m328p -U hfuse:w:0xDA:m
 avrdude -c nanopineo -p m328p -U efuse:w:0x05:m
-avrdude -c nanopineo -p m328p -U flash:w:bakebit_firmware.hex
+avrdude -c nanopineo -p m328p -U flash:w:bakebit_firmware.hex -F
 
 
