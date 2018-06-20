@@ -45,7 +45,7 @@ bus = smbus.SMBus(0)
 address=0x3c
 addressingMode= None
 SeeedOLED_Width			=128 #128 Pixels
-SeeedOLED_Height		=32  #64  Pixels
+SeeedOLED_Height		=32  #32  Pixels
 SeeedOLED_Max_X                 =SeeedOLED_Width-1
 SeeedOLED_Max_Y                 =SeeedOLED_Height-1
                                 
