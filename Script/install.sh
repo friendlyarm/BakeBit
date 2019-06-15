@@ -52,7 +52,7 @@ echo " "
 echo "Installing Dependencies"
 echo "======================="
 sudo apt-get install python2.7 -y
-sudo apt-get install python-pip git libi2c-dev python-serial i2c-tools python-smbus minicom python-dev libfreetype6-dev -y
+sudo apt-get install python-pip git libi2c-dev python-serial i2c-tools python-smbus minicom python-dev libfreetype6-dev libjpeg-dev -y
 yes | sudo pip install --upgrade pip
 yes | sudo pip install image
 # yes | sudo pip uninstall pillow
