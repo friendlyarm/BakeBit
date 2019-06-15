@@ -49,8 +49,8 @@ SeeedOLED_Height		=64  #64  Pixels
 SeeedOLED_Max_X                 =SeeedOLED_Width-1
 SeeedOLED_Max_Y                 =SeeedOLED_Height-1
                                 
-PAGE_MODE                       =01
-HORIZONTAL_MODE                 =02
+PAGE_MODE                       =0x01
+HORIZONTAL_MODE                 =0x02
                                                             
 SeeedOLED_Address               =0x3d
 SeeedOLED_Command_Mode          =0x00
