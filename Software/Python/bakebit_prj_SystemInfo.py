@@ -65,35 +65,7 @@ def filesizeformat(value):
     exponent = int(log(value, 1024))
     return "%.1f %s" % (float(value) / pow(1024, exponent), byteunits[exponent])
 
-memUsage = psutil.phymem_usage()
-diskUsage = psutil.disk_usage('/')
-
-oled.setTextXY(0,0)
-oled.putString("%s" % get_ip_address('eth0'))
-
-oled.setTextXY(0,1)
-oled.putString("Mem:%s" % filesizeformat(memUsage.total))
-import time
-import bakebit
-import os
-import psutil
-from math import log
-import multiprocessing
-import platform
-import socket
-import bakebit_128_64_oled as oled
-
-oled.init()                  #initialze SEEED OLED display
-oled.clearDisplay()          #clear the screen and set start position to top left corner
-oled.setNormalDisplay()      #Set display to normal mode (i.e non-inverse mode)
-oled.setPageMode()           #Set addressing mode to Page Mode
-
-byteunits = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
-def filesizeformat(value):
-    exponent = int(log(value, 1024))
-    return "%.1f %s" % (float(value) / pow(1024, exponent), byteunits[exponent])
-
-memUsage = psutil.phymem_usage()
+memUsage = psutil.virtual_memory()
 diskUsage = psutil.disk_usage('/')
 
 oled.setTextXY(0,0)
@@ -124,27 +96,4 @@ with open("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq") as f:
 		freqStr = "%.1f GHz" % (float(freq)/1000.0)
 	oled.setTextXY(0,7)
 	oled.putString("Freq:%s" % freqStr)
-oled.setTextXY(0,2)
-oled.putString("Usage:%d%%" % memUsage.percent)
-
-oled.setTextXY(0,3)
-oled.putString("Disk:%s" % filesizeformat(diskUsage.total))
-
-oled.setTextXY(0,4)
-oled.putString("Usage:%d%%" % diskUsage.percent)
-
-oled.setTextXY(0,5)
-oled.putString("CPU:%s" % platform.processor())
-
-oled.setTextXY(0,6)
-oled.putString("Cores:%d" % multiprocessing.cpu_count())
-
-with open("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq") as f:
-	freq = int(f.readlines()[0])/1000
-	freqStr = "%d MHz" % freq
-	if freq > 1000:
-		freqStr = "%.1f GHz" % (float(freq)/1000.0)
-	oled.setTextXY(0,7)
-	oled.putString("Freq:%s" % freqStr)
-
 
