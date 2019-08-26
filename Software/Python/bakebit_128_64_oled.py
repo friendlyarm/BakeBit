@@ -48,10 +48,10 @@ SeeedOLED_Width			=128 #128 Pixels
 SeeedOLED_Height		=64  #64  Pixels
 SeeedOLED_Max_X                 =SeeedOLED_Width-1
 SeeedOLED_Max_Y                 =SeeedOLED_Height-1
-                                
+
 PAGE_MODE                       =0x01
 HORIZONTAL_MODE                 =0x02
-                                                            
+
 SeeedOLED_Address               =0x3d
 SeeedOLED_Command_Mode          =0x00
 SeeedOLED_Data_Mode             =0x40 #####
@@ -65,7 +65,7 @@ SeeedOLED_Set_Brightness_Cmd    =0x81
 
 Scroll_Left             =0x00
 Scroll_Right            =0x01
-                        
+
 Scroll_2Frames          =0x7
 Scroll_3Frames          =0x4
 Scroll_4Frames          =0x5
@@ -196,7 +196,7 @@ def sendArrayData(array):
         return bus.write_i2c_block_data(address,SeeedOLED_Data_Mode,array)
     except IOError:
         print("IOError")
-        return -1    
+        return -1
 
 def multi_comm(commands):
     for c in commands:
@@ -205,95 +205,95 @@ def multi_comm(commands):
 def base_init():
         sendCommand(0x00)    #set lower column address
         sendCommand(0x10)    #set higher column address
-  
+
         sendCommand(0x40)    #set display start line
-  
+
         sendCommand(0xB0)    #set page address
-  
+
         sendCommand(0x81)
         sendCommand(0xCF)    #0~255????????????????
-  
+
         sendCommand(0xA1)    #set segment remap
-  
+
         sendCommand(0xA6)    #normal / reverse
-  
+
         sendCommand(0xA8)    #multiplex ratio
         sendCommand(0x3F)    #duty = 1/64
-  
+
         sendCommand(0xC8)    #Com scan direction
-  
+
         sendCommand(0xD3)    #set display offset
         sendCommand(0x00);
-  
+
         sendCommand(0xD5)    #set osc division
         sendCommand(0x80);
-  
+
         sendCommand(0xD9)    #set pre-charge period
         sendCommand(0xF1);
-  
+
         sendCommand(0xDA)    #set COM pins
         sendCommand(0x12);
-  
+
         sendCommand(0xDB)    #set vcomh
         sendCommand(0x40);
-  
+
         sendCommand(0x8D)    #set charge pump enable
         sendCommand(0x14);
-  
+
 
 # Init function of the OLED
 def init():
         sendCommand(0xAE)    #display off
-  
+
         sendCommand(0x00)    #set lower column address
         sendCommand(0x10)    #set higher column address
-  
+
         sendCommand(0x40)    #set display start line
-  
+
         sendCommand(0xB0)    #set page address
-  
+
         sendCommand(0x81)
         sendCommand(0xCF)    #0~255????????????????
-  
+
         sendCommand(0xA1)    #set segment remap
-  
+
         sendCommand(0xA6)    #normal / reverse
-  
+
         sendCommand(0xA8)    #multiplex ratio
         sendCommand(0x3F)    #duty = 1/64
-  
+
         sendCommand(0xC8)    #Com scan direction
-  
+
         sendCommand(0xD3)    #set display offset
         sendCommand(0x00);
-  
+
         sendCommand(0xD5)    #set osc division
         sendCommand(0x80);
-  
+
         sendCommand(0xD9)    #set pre-charge period
         sendCommand(0xF1);
-  
+
         sendCommand(0xDA)    #set COM pins
         sendCommand(0x12);
-  
+
         sendCommand(0xDB)    #set vcomh
         sendCommand(0x40);
-  
+
         sendCommand(0x8D)    #set charge pump enable
         sendCommand(0x14);
-  
+
         sendCommand(0xAF)    #display ON
 
 #	sendCommand(SeeedOLED_Display_Off_Cmd)     #display off
-#	time.sleep(.005) 
+#	time.sleep(.005)
 #	sendCommand(SeeedOLED_Display_On_Cmd)  	#display on
-#	time.sleep(.005) 
+#	time.sleep(.005)
 #	sendCommand(SeeedOLED_Normal_Display_Cmd)  #Set Normal Display (default)
 
 def setBrightness(Brightness):
    sendCommand(SeeedOLED_Set_Brightness_Cmd)
    sendCommand(Brightness)
-  
+
 def setHorizontalMode():
 	global addressingMode
 	addressingMode = HORIZONTAL_MODE
@@ -314,11 +314,11 @@ def setTextXY(Column,Row):
 def clearDisplay():
 	sendCommand(SeeedOLED_Display_Off_Cmd)   #display off
 	for j in range(8):
-		setTextXY(0,j)    
+		setTextXY(0,j)
 		for i in range(16):  #clear all columns
-			putChar(' ')    
+			putChar(' ')
 	sendCommand(SeeedOLED_Display_On_Cmd)    #display on
-	setTextXY(0,0)    
+	setTextXY(0,0)
 
 def putChar(C):
 	C_add=ord(C)
@@ -329,7 +329,7 @@ def putChar(C):
 	for i in range(8):
 		data=(BasicFont[C_add-32][i])
 		sendData(data)
-	
+
     # for i in range(0,8,2):
         # for j in range(0,8):
             # c=0x00
@@ -363,7 +363,7 @@ def drawImage(image):
     pix = image.load()
     # Iterate through the memory pages
     bitList = []
-    pages=SeeedOLED_Height/8
+    pages=SeeedOLED_Height//8
     for page in range(pages):
         # Iterate through all x axis columns.
         for x in range(SeeedOLED_Width):
@@ -382,7 +382,7 @@ def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     for i in range(0, len(l), n):
         yield l[i:i + n]
-		
+
 def putNumber(long_num):
 	char_buffer[10]=None
 	i = 0
@@ -392,12 +392,12 @@ def putNumber(long_num):
 		f=1
 		putChar('-')
 		long_num = -long_num
-		
+
 	elif (long_num == 0) :
 		f=1
 		putChar('0')
 		return f
-	
+
 	while (long_num > 0):
 		char_buffer[i] = long_num % 10
 		long_num /= 10
@@ -414,13 +414,13 @@ def setHorizontalScrollProperties(direction,startPage, endPage, scrollSpeed):
 
 	'''
 	Use the following defines for 'direction' :
-	Scroll_Left            
-	Scroll_Right           
+	Scroll_Left
+	Scroll_Right
 	Use the following defines for 'scrollSpeed' :
-	Scroll_2Frames     
+	Scroll_2Frames
 	Scroll_3Frames
 	Scroll_4Frames
-	Scroll_5Frames 
+	Scroll_5Frames
 	Scroll_25Frames
 	Scroll_64Frames
 	Scroll_128Frames
@@ -431,7 +431,7 @@ def setHorizontalScrollProperties(direction,startPage, endPage, scrollSpeed):
 		#Scroll Right
 		sendCommand(0x26)
 	else:
-		#Scroll Left  
+		#Scroll Left
 		sendCommand(0x27)
 
 	sendCommand(0x00)

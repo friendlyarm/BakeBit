@@ -34,6 +34,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
+from __future__ import print_function
 import bakebit_128_64_oled as oled
 from PIL import Image
 from PIL import ImageFont
@@ -62,7 +63,7 @@ oled.init()  #initialze SEEED OLED display
 oled.setNormalDisplay()      #Set display to normal mode (i.e non-inverse mode)
 oled.setHorizontalMode()
 
-global drawing 
+global drawing
 drawing = False
 
 global image
@@ -71,7 +72,7 @@ global draw
 draw = ImageDraw.Draw(image)
 global fontb24
 fontb24 = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 24);
-global font14 
+global font14
 font14 = ImageFont.truetype('DejaVuSansMono.ttf', 14);
 global smartFont
 smartFont = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 10);
@@ -123,8 +124,8 @@ def draw_page():
     lock.acquire()
     drawing = True
     lock.release()
-    
-    # Draw a black filled box to clear the image.            
+
+    # Draw a black filled box to clear the image.
     draw.rectangle((0,0,width,height), outline=0, fill=0)
     # Draw current page indicator
     if showPageIndicator:
@@ -154,7 +155,7 @@ def draw_page():
         bottom = height-padding
         # Move left to right keeping track of the current x position for drawing shapes.
         x = 0
-	IPAddress = get_ip()
+        IPAddress = get_ip()
         cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
         CPU = subprocess.check_output(cmd, shell = True )
         cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
@@ -227,7 +228,7 @@ def receive_signal(signum, stack):
         return
 
     if signum == signal.SIGUSR1:
-        print 'K1 pressed'
+        print('K1 pressed')
         if is_showing_power_msgbox():
             if page_index==3:
                 update_page_index(4)
@@ -239,12 +240,12 @@ def receive_signal(signum, stack):
             draw_page()
 
     if signum == signal.SIGUSR2:
-        print 'K2 pressed'
+        print('K2 pressed')
         if is_showing_power_msgbox():
             if page_index==4:
                 update_page_index(5)
                 draw_page()
- 
+
             else:
                 update_page_index(0)
                 draw_page()
@@ -253,7 +254,7 @@ def receive_signal(signum, stack):
             draw_page()
 
     if signum == signal.SIGALRM:
-        print 'K3 pressed'
+        print('K3 pressed')
         if is_showing_power_msgbox():
             update_page_index(0)
             draw_page()
@@ -296,8 +297,8 @@ while True:
             time.sleep(1)
             os.system('systemctl poweroff')
             break
-        time.sleep(1)
-    except KeyboardInterrupt:                                                                                                          
-        break                     
-    except IOError:                                                                              
+        time.sleep(0.2)
+    except KeyboardInterrupt:
+        break
+    except IOError:
         print ("Error")

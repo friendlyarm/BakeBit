@@ -4,6 +4,22 @@ BakeBit is an open source platform for connecting BakeBit Sensors to the NanoPi 
 
 Currently supported boards: NanoPi NEO, NanoPi NEO2, NanoPi NEO Air.
 
+## Introduction
+
+The fork based on https://github.com/friendlyarm/BakeBit
+and work well on armbian buster or ubuntu-core bionic with Python 3.x
+It abandon using PIP(Python Package Installer) when installing, 
+take full advantage of APT with the latest release packages of distribution.
+
+## Installtion
+
+```
+# git clone https://github.com/CuitGGyy/BakeBit.git
+# cd BakeBit
+# sudo -H ./install.sh
+```
+The demo will automatically start at the next reboot.
+
 ## License
 
 The MIT License (MIT)
