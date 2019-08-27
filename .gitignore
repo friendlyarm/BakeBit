@@ -1,12 +1,13 @@
 # =========================
 # Repository Ingores
 # =========================
-README.md~
 Software/Python/__pycache__
 Software/Python/.idea
-
-# Other
 WiringNP
+
+# Vim backup
+README.md~
+# Vim swap
 *.swp
 
 # =========================

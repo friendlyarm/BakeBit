@@ -1,6 +1,6 @@
 #! /bin/bash
 echo "Welcome to BakeBit Installer."
-echo " "
+echo ""
 echo "Requirements:"
 echo "1) Must be connected to the internet"
 echo "2) This script must be run as root user"
@@ -19,15 +19,15 @@ echo "   - python3-rpi.gpio Module to control Raspberry Pi GPIO channels for Pyt
 echo "   - python3-psutil   a cross-platform process and system utilities module for Python3"
 echo "   - python3-pil      Python Imaging Library (Python3)"
 echo "   - WiringNP         a GPIO access library for NanoPi NEO/NEO2"
-echo " "
+echo ""
 echo " NanoPi will reboot after completion."
-echo " "
-echo " "
+echo ""
+echo ""
 sleep 5
 
-echo " "
-echo "Check for internet connectivity..."
-echo "=================================="
+echo ""
+echo "Checking Internet Connectivity..."
+echo "================================="
 wget -q --tries=2 --timeout=100 http://www.baidu.com -O /dev/null
 if [ $? -eq 0 ];then
     echo "Connected"
@@ -40,16 +40,19 @@ USER_ID=$(id -u)
 USER_NAME=$(whoami)
 REAL_PATH=$(realpath $(dirname $0))
 
+echo ""
+echo "Checking User ID..."
+echo "==================="
 if [ ${USER_ID} -ne 0 ]; then
-    echo "Please run this as root."
+    echo "Please run this script as root, try 'sudo ./install.sh'"
     exit 1
 fi
 echo ""
-echo "Checking For Updates..."
-sudo apt-get update --yes
+echo "Checking for Updates..."
 echo "======================="
+sudo apt-get update --yes
 
-echo " "
+echo ""
 echo "Installing Dependencies"
 echo "======================="
 sudo apt-get install i2c-tools libi2c-dev minicom git -y
@@ -72,9 +75,9 @@ if [ ! -f build ]; then
 fi
 
 sudo ./build
-RES=$?
+RET=$?
 
-if [ $RES -ne 0 ]; then
+if [ $RET -ne 0 ]; then
     echo "Something wrong when building/installing WiringNP, exiting."
     popd && exit 1
 fi
@@ -85,8 +88,8 @@ echo "WiringNP Installed"
 sudo adduser ${USER_NAME} i2c
 
 echo " "
-echo "Making libraries global ..."
-echo "==========================="
+echo "Making libraries global..."
+echo "=========================="
 if [ -d /usr/lib/python3/dist-packages ]; then
     sudo echo "${REAL_PATH}/Software/Python/" > /usr/lib/python3/dist-packages/bakebit.pth
 else

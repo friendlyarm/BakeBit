@@ -1,4 +1,13 @@
 ###############################################################################
+# Set github default language setting.
+###############################################################################
+Firmware/* linguist-vendored
+Hardware/* linguist-vendored
+*.c linguist-language=Python
+*.h linguist-language=Python
+*.py linguist-language=Python
+
+###############################################################################
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto

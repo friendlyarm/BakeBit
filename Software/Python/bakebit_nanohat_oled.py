@@ -150,18 +150,18 @@ def draw_page():
     elif page_index==1:
         # Draw some shapes.
         # First define some constants to allow easy resizing of shapes.
-        padding = 2
+        padding = 0
         top = padding
         bottom = height-padding
         # Move left to right keeping track of the current x position for drawing shapes.
         x = 0
         IPAddress = get_ip()
         cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-        CPU = subprocess.check_output(cmd, shell = True )
+        CPU = subprocess.check_output(cmd, shell = True, encoding='utf-8' )
         cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
-        MemUsage = subprocess.check_output(cmd, shell = True )
+        MemUsage = subprocess.check_output(cmd, shell = True, encoding='utf-8' )
         cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
-        Disk = subprocess.check_output(cmd, shell = True )
+        Disk = subprocess.check_output(cmd, shell = True, encoding='utf-8' )
         tempI = int(open('/sys/class/thermal/thermal_zone0/temp').read());
         if tempI>1000:
             tempI = tempI/1000
@@ -238,6 +238,7 @@ def receive_signal(signum, stack):
         else:
             pageIndex=0
             draw_page()
+        print('K1 released')
 
     if signum == signal.SIGUSR2:
         print('K2 pressed')
@@ -252,6 +253,7 @@ def receive_signal(signum, stack):
         else:
             update_page_index(1)
             draw_page()
+        print('K2 released')
 
     if signum == signal.SIGALRM:
         print('K3 pressed')
@@ -261,6 +263,7 @@ def receive_signal(signum, stack):
         else:
             update_page_index(3)
             draw_page()
+        print('K3 released')
 
 
 image0 = Image.open('friendllyelec.png').convert('1')
@@ -297,7 +300,10 @@ while True:
             time.sleep(1)
             os.system('systemctl poweroff')
             break
-        time.sleep(0.2)
+        elif page_index==1:
+            time.sleep(1)
+        else:
+            time.sleep(0.2)
     except KeyboardInterrupt:
         break
     except IOError:
