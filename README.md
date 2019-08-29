@@ -12,18 +12,27 @@ Currently supported boards: NanoPi NEO, NanoPi NEO2, NanoPi NEO Air.
 
 The fork based on https://github.com/friendlyarm/BakeBit
 
-The code work well on armbian buster or ubuntu-core bionic with Python 3.x
+The code work well on armbian or ubuntu-core with Python 3.x
 
-I abandon using PIP(Python Package Installer) when installing, 
-take full advantage of APT with the latest release packages of distribution.
+I abandon using PIP(Python Package Installer) when installing in install.sh, but not in install-compatible.sh, and take full advantage of APT with the latest release packages of distribution.
 
 
 ## Installtion
+
+#### Armbian Stretch / Ubuntu Core Xenial
 
 ```
 # git clone https://github.com/CuitGGyy/BakeBit.git
 # cd BakeBit
 # sudo -H ./install.sh
+```
+
+#### Armbian Buster / Ubuntu Core Bionic
+
+```
+# git clone https://github.com/CuitGGyy/BakeBit.git
+# cd BakeBit
+# sudo -H ./install-compat.sh
 ```
 
 The demo will automatically start at the next reboot.

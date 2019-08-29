@@ -13,9 +13,10 @@ echo "   - minicom          friendly menu driven serial communication program"
 echo "   - git              fast, scalable, distributed revision control system"
 echo "   - python3          interactive high-level object-oriented language, Python3 version"
 echo "   - python3-dev      header files and a static library for Python3"
+#echo "   - python3-pip      alternative Python3 package installer"
 echo "   - python3-smbus    Python3 bindings for Linux SMBus access through i2c-dev"
-echo "   - python3-serial   pyserial - module encapsulating access for the serial port"
 echo "   - python3-rpi.gpio Module to control Raspberry Pi GPIO channels for Python3"
+echo "   - python3-serial   pyserial - module encapsulating access for the serial port"
 echo "   - python3-psutil   a cross-platform process and system utilities module for Python3"
 echo "   - python3-pil      Python Imaging Library (Python3)"
 echo "   - WiringNP         a GPIO access library for NanoPi NEO/NEO2"
@@ -57,13 +58,16 @@ echo "Installing Dependencies"
 echo "======================="
 sudo apt-get install i2c-tools libi2c-dev minicom git -y
 sudo apt-get install python3 python3-dev python3-smbus python3-serial python3-rpi.gpio python3-psutil python3-pil -y
+#sudo apt-get install python3 python3-dev python3-pip python3-serial python3-psutil python3-pil -y
+#yes | sudo pip3 install smbus
+#yes | sudo pip3 install RPi.GPIO
 echo "Dependencies installed"
 
-echo " "
+echo ""
 echo "Installing WiringNP..."
 echo "======================="
 if [ ! -d WiringNP ]; then
-    git clone https://github.com/friendlyarm/WiringNP.git
+    git clone --depth=1 https://github.com/friendlyarm/WiringNP.git
 fi
 
 pushd WiringNP
