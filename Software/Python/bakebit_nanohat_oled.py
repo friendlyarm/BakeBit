@@ -157,11 +157,11 @@ def draw_page():
         x = 0
         IPAddress = get_ip()
         cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-        CPU = subprocess.check_output(cmd, shell = True, encoding='utf-8' )
+        CPU = subprocess.check_output(cmd, shell=True).decode('utf-8')
         cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
-        MemUsage = subprocess.check_output(cmd, shell = True, encoding='utf-8' )
+        MemUsage = subprocess.check_output(cmd, shell=True).decode('utf-8')
         cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
-        Disk = subprocess.check_output(cmd, shell = True, encoding='utf-8' )
+        Disk = subprocess.check_output(cmd, shell=True).decode('utf-8')
         tempI = int(open('/sys/class/thermal/thermal_zone0/temp').read());
         if tempI>1000:
             tempI = tempI/1000
