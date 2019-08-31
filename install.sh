@@ -1,4 +1,7 @@
-#! /bin/bash -euo pipefail
+#!/bin/bash
+set -o errexit -o nounset -o pipefail
+
+echo ""
 echo "Welcome to BakeBit Installer."
 echo ""
 echo "Requirements:"
@@ -22,7 +25,6 @@ echo "   - python3-pil      Python Imaging Library (Python3)"
 echo "   - WiringNP         a GPIO access library for NanoPi NEO/NEO2"
 echo ""
 echo " NanoPi will reboot after completion."
-echo ""
 echo ""
 sleep 5
 
