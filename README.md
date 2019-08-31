@@ -22,7 +22,7 @@ I abandon using PIP(Python Package Installer) when installing in install.sh, but
 #### Armbian Stretch / Ubuntu Core Xenial
 
 ```
-# git clone https://github.com/CuitGGyy/BakeBit.git
+# git clone --depth=1 https://github.com/CuitGGyy/BakeBit.git
 # cd BakeBit
 # sudo -H ./install.sh
 ```
@@ -30,7 +30,7 @@ I abandon using PIP(Python Package Installer) when installing in install.sh, but
 #### Armbian Buster / Ubuntu Core Bionic
 
 ```
-# git clone https://github.com/CuitGGyy/BakeBit.git
+# git clone --depth=1 https://github.com/CuitGGyy/BakeBit.git
 # cd BakeBit
 # sudo -H ./install-compat.sh
 ```

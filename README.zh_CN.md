@@ -25,7 +25,7 @@ BakeBit 是一个基于 GrovePi 的开源平台, 它连接 NanoPi 上的 BakeBit
 #### Armbian Strectch / Ubuntu Core Xenial
 
 ```
-# git clone https://github.com/CuitGGyy/BakeBit.git
+# git clone --depth=1 https://github.com/CuitGGyy/BakeBit.git
 # cd BakeBit
 # sudo -H ./install.sh
 ```
@@ -33,7 +33,7 @@ BakeBit 是一个基于 GrovePi 的开源平台, 它连接 NanoPi 上的 BakeBit
 #### Armbian Buster / Ubuntu Core Bionic
 
 ```
-# git clone https://github.com/CuitGGyy/BakeBit.git
+# git clone --depth=1 https://github.com/CuitGGyy/BakeBit.git
 # cd BakeBit
 # sudo -H ./install-compat.sh
 ```
