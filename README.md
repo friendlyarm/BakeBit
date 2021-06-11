@@ -1,7 +1,7 @@
 ## **BakeBit**
 
-[English](https://github.com/CuitGGyy/BakeBit)
-[汉语](https://github.com/CuitGGyy/BakeBit/blob/master/README.zh_CN.md)
+[English](https://github.com/friendlyarm/BakeBit)
+[汉语](https://github.com/friendlyarm/BakeBit/blob/master/README.zh_CN.md)
 
 
 BakeBit is an open source platform for connecting BakeBit Sensors to the NanoPi NEO/NEO2. It is based on the GrovePi.
@@ -10,27 +10,26 @@ Currently supported boards: NanoPi NEO, NanoPi NEO2, NanoPi NEO Air.
 
 ## Introduction
 
-The fork based on https://github.com/friendlyarm/BakeBit
-
-The code work well on armbian or ubuntu-core with Python 3.x
+The code work well on armbian or friendlycore (ubuntu-core) with Python 3.x
 
 I abandon using PIP(Python Package Installer) when installing in install.sh, but not in install-compatible.sh, and take full advantage of APT with the latest release packages of distribution.
 
+The original implementation was based on Python2, thanks to [CuitGGyy](https://github.com/CuitGGyy/BakeBit) for porting it to Python 3.x environment.
 
 ## Installtion
 
-#### Armbian Stretch / Ubuntu Core Xenial
+#### FriendlyCore Xenial / Armbian Stretch / Ubuntu Core Xenial
 
 ```
-# git clone --depth=1 https://github.com/CuitGGyy/BakeBit.git
+# git clone --depth=1 https://github.com/friendlyarm/BakeBit.git
 # cd BakeBit
 # sudo -H ./install.sh
 ```
 
-#### Armbian Buster / Ubuntu Core Bionic
+#### FriendlyCore Focal / Armbian Buster / Ubuntu Core Bionic
 
 ```
-# git clone --depth=1 https://github.com/CuitGGyy/BakeBit.git
+# git clone --depth=1 https://github.com/friendlyarm/BakeBit.git
 # cd BakeBit
 # sudo -H ./install-compat.sh
 ```
