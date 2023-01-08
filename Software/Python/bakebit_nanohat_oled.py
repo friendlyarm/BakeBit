@@ -48,19 +48,30 @@ import os
 import socket
 
 global width
-width=128
+width = 128
 global height
-height=64
+height = 64
 
 global pageCount
-pageCount=2
+pageCount = 2
 global pageIndex
-pageIndex=0
+pageIndex = 0
 global showPageIndicator
-showPageIndicator=False
+showPageIndicator = False
 
-oled.init()  #initialze SEEED OLED display
-oled.setNormalDisplay()      #Set display to normal mode (i.e non-inverse mode)
+global last_index
+last_index = 0
+global options
+options = "Options"
+global optionA
+optionA = "Shutdown?"
+global optionB
+optionB = "Reboot?"
+global statue
+statue = "not available"
+
+oled.init()  # initialze SEEED OLED display
+oled.setNormalDisplay()  # Set display to normal mode (i.e non-inverse mode)
 oled.setHorizontalMode()
 
 global drawing
@@ -71,18 +82,19 @@ image = Image.new('1', (width, height))
 global draw
 draw = ImageDraw.Draw(image)
 global fontb24
-fontb24 = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 24);
+fontb24 = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 24)
 global font14
-font14 = ImageFont.truetype('DejaVuSansMono.ttf', 14);
+font14 = ImageFont.truetype('DejaVuSansMono.ttf', 14)
 global smartFont
-smartFont = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 10);
+smartFont = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 10)
 global fontb14
-fontb14 = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 14);
+fontb14 = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 14)
 global font11
-font11 = ImageFont.truetype('DejaVuSansMono.ttf', 11);
+font11 = ImageFont.truetype('DejaVuSansMono.ttf', 11)
 
 global lock
 lock = threading.Lock()
+
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -95,6 +107,7 @@ def get_ip():
     finally:
         s.close()
     return IP
+
 
 def draw_page():
     global drawing
@@ -112,6 +125,11 @@ def draw_page():
     global width
     global height
     global lock
+    global options
+    global optionA
+    global optionB
+    global drawing
+    global statue
 
     lock.acquire()
     is_drawing = drawing
@@ -126,73 +144,87 @@ def draw_page():
     lock.release()
 
     # Draw a black filled box to clear the image.
-    draw.rectangle((0,0,width,height), outline=0, fill=0)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
     # Draw current page indicator
     if showPageIndicator:
-        dotWidth=4
-        dotPadding=2
-        dotX=width-dotWidth-1
-        dotTop=(height-pageCount*dotWidth-(pageCount-1)*dotPadding)/2
+        dotWidth = 4
+        dotPadding = 2
+        dotX = width-dotWidth-1
+        dotTop = (height-pageCount*dotWidth-(pageCount-1)*dotPadding)/2
         for i in range(pageCount):
-            if i==page_index:
-                draw.rectangle((dotX, dotTop, dotX+dotWidth, dotTop+dotWidth), outline=255, fill=255)
+            if i == page_index:
+                draw.rectangle((dotX, dotTop, dotX+dotWidth,
+                               dotTop+dotWidth), outline=255, fill=255)
             else:
-                draw.rectangle((dotX, dotTop, dotX+dotWidth, dotTop+dotWidth), outline=255, fill=0)
-            dotTop=dotTop+dotWidth+dotPadding
+                draw.rectangle((dotX, dotTop, dotX+dotWidth,
+                               dotTop+dotWidth), outline=255, fill=0)
+            dotTop = dotTop+dotWidth+dotPadding
 
-    if page_index==0:
+    x = 0
+    y = 0
+    # Move left to right keeping track of the current x position for drawing shapes.
+    if int(time.strftime("%M")) % 3 == 0:  # oled shifts every 3 minutes
+        x = 2
+        y = 2
+
+    if page_index == 0:
         text = time.strftime("%A")
-        draw.text((2,2),text,font=font14,fill=255)
+        draw.text((28+x, 0+y), text, font=font14, fill=255)
         text = time.strftime("%e %b %Y")
-        draw.text((2,18),text,font=font14,fill=255)
+        draw.text((13+x, 18+y), text, font=font14, fill=255)
         text = time.strftime("%X")
-        draw.text((2,40),text,font=fontb24,fill=255)
-    elif page_index==1:
-        # Draw some shapes.
-        # First define some constants to allow easy resizing of shapes.
-        padding = 0
-        top = padding
-        bottom = height-padding
-        # Move left to right keeping track of the current x position for drawing shapes.
-        x = 0
+        draw.text((6+x, 33+y), text, font=fontb24, fill=255)
+
+    elif page_index == 1:
         IPAddress = get_ip()
-        cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-        CPU = subprocess.check_output(cmd, shell=True).decode('utf-8')
-        cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
+        if int(time.strftime("%S")) < 20:
+            cmd_1min = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"
+            CPU_1min = subprocess.check_output(
+                cmd_1min, shell=True).decode('utf-8')
+            CPU = "CPU: %s" % str(int(float(CPU_1min)*100/4)) + "% / 1min"
+        elif int(time.strftime("%S")) < 40:
+            cmd_5min = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-1)}'"
+            CPU_5min = subprocess.check_output(
+                cmd_5min, shell=True).decode('utf-8')
+            CPU = "CPU: %s" % str(int(float(CPU_5min)*100/4)) + "% / 5min"
+        else:
+            cmd_15min = "top -bn1 | grep load | awk '{printf \"%s\", $(NF-0)}'"
+            CPU_15min = subprocess.check_output(
+                cmd_15min, shell=True).decode('utf-8')
+            CPU = "CPU: %s" % str(int(float(CPU_15min)*100/4)) + "% / 15min"
+        cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %d%\", $3,$2,$3*100/$2 }'"
         MemUsage = subprocess.check_output(cmd, shell=True).decode('utf-8')
         cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
         Disk = subprocess.check_output(cmd, shell=True).decode('utf-8')
-        tempI = int(open('/sys/class/thermal/thermal_zone0/temp').read());
-        if tempI>1000:
+        tempI = int(open('/sys/class/thermal/thermal_zone0/temp').read())
+        if tempI > 1000:
             tempI = tempI/1000
-        tempStr = "CPU TEMP: %sC" % str(tempI)
+        tempStr = "Core Temp: %.1fC" % float(tempI)
 
-        draw.text((x, top+5),       "IP: " + str(IPAddress),  font=smartFont, fill=255)
-        draw.text((x, top+5+12),    str(CPU), font=smartFont, fill=255)
-        draw.text((x, top+5+24),    str(MemUsage),  font=smartFont, fill=255)
-        draw.text((x, top+5+36),    str(Disk),  font=smartFont, fill=255)
-        draw.text((x, top+5+48),    tempStr,  font=smartFont, fill=255)
-    elif page_index==3: #shutdown -- no
-        draw.text((2, 2),  'Shutdown?',  font=fontb14, fill=255)
+        draw.text((x, y+1),       "IP: " +
+                  str(IPAddress),  font=smartFont, fill=255)
+        draw.text((x, y+1+12),    str(CPU), font=smartFont, fill=255)
+        draw.text((x, y+1+24),    str(MemUsage),  font=smartFont, fill=255)
+        draw.text((x, y+1+36),    str(Disk),  font=smartFont, fill=255)
+        draw.text((x, y+1+48),    tempStr,  font=smartFont, fill=255)
 
-        draw.rectangle((2,20,width-4,20+16), outline=0, fill=0)
-        draw.text((4, 22),  'Yes',  font=font11, fill=255)
+    elif page_index == 3:  # optionA
+        draw.text((2, 2),  options,  font=fontb14, fill=255)
+        draw.rectangle((2, 20, width-4, 20+16), outline=0, fill=255)
+        draw.text((4, 22),  optionA,  font=font11, fill=0)
+        draw.rectangle((2, 38, width-4, 38+16), outline=0, fill=0)
+        draw.text((4, 40),  optionB,  font=font11, fill=255)
 
-        draw.rectangle((2,38,width-4,38+16), outline=0, fill=255)
-        draw.text((4, 40),  'No',  font=font11, fill=0)
+    elif page_index == 4:  # optionB
+        draw.text((2, 2),  options,  font=fontb14, fill=255)
+        draw.rectangle((2, 20, width-4, 20+16), outline=0, fill=0)
+        draw.text((4, 22),  optionA,  font=font11, fill=255)
+        draw.rectangle((2, 38, width-4, 38+16), outline=0, fill=255)
+        draw.text((4, 40),  optionB,  font=font11, fill=0)
 
-    elif page_index==4: #shutdown -- yes
-        draw.text((2, 2),  'Shutdown?',  font=fontb14, fill=255)
-
-        draw.rectangle((2,20,width-4,20+16), outline=0, fill=255)
-        draw.text((4, 22),  'Yes',  font=font11, fill=0)
-
-        draw.rectangle((2,38,width-4,38+16), outline=0, fill=0)
-        draw.text((4, 40),  'No',  font=font11, fill=255)
-
-    elif page_index==5:
-        draw.text((2, 2),  'Shutting down',  font=fontb14, fill=255)
-        draw.text((2, 20),  'Please wait',  font=font11, fill=255)
+    elif page_index == 5:
+        draw.text((2, 10),  statue,  font=fontb14, fill=255)
+        draw.text((2, 30),  'Please wait...',  font=font11, fill=255)
 
     oled.drawImage(image)
 
@@ -206,9 +238,28 @@ def is_showing_power_msgbox():
     lock.acquire()
     page_index = pageIndex
     lock.release()
-    if page_index==3 or page_index==4:
+    if (page_index == 3) or (page_index == 4):
         return True
     return False
+
+
+def option_status(st):
+    global options, optionA, optionB, statue
+    if st == "shutdown":
+        options = "Shutdown?"
+        optionA = "Yes"
+        optionB = "No"
+        statue = "shutting down"
+    elif st == "reboot":
+        options = "Reboot?"
+        optionA = "Yes"
+        optionB = "No"
+        statue = "rebooting"
+    else:
+        options = "Options"
+        optionA = "Shutdown"
+        optionB = "Reboot"
+        statue = "not available"
 
 
 def update_page_index(pi):
@@ -217,40 +268,58 @@ def update_page_index(pi):
     pageIndex = pi
     lock.release()
 
+
 def receive_signal(signum, stack):
     global pageIndex
+    global options
+    global optionA
+    global optionB
+    global drawing
+    global statue
+    global last_index
 
     lock.acquire()
     page_index = pageIndex
     lock.release()
 
-    if page_index==5:
+    if page_index == 5:
+        time.sleep(1)
         return
 
     if signum == signal.SIGUSR1:
         print('K1 pressed')
         if is_showing_power_msgbox():
-            if page_index==3:
+            if page_index == 3:
                 update_page_index(4)
             else:
                 update_page_index(3)
             draw_page()
         else:
-            pageIndex=0
+            pageIndex = 0
             draw_page()
         print('K1 released')
 
     if signum == signal.SIGUSR2:
         print('K2 pressed')
         if is_showing_power_msgbox():
-            if page_index==4:
-                update_page_index(5)
-                draw_page()
-
+            if page_index == 3:
+                if options == "Options":
+                    option_status("shutdown")
+                    update_page_index(4)
+                elif options == "Shutdown?":
+                    update_page_index(5)
+                elif options == "Reboot?":
+                    update_page_index(5)
             else:
-                update_page_index(0)
-                draw_page()
+                if options == "Options":
+                    option_status("reboot")
+                    update_page_index(4)
+                elif options == "Shutdown?" or options == "Reboot?":
+                    option_status("default")
+                    pageIndex = last_index
+            draw_page()
         else:
+            option_status("default")
             update_page_index(1)
             draw_page()
         print('K2 released')
@@ -258,9 +327,11 @@ def receive_signal(signum, stack):
     if signum == signal.SIGALRM:
         print('K3 pressed')
         if is_showing_power_msgbox():
-            update_page_index(0)
+            option_status("default")
+            update_page_index(last_index)
             draw_page()
         else:
+            last_index = page_index
             update_page_index(3)
             draw_page()
         print('K3 released')
@@ -282,8 +353,8 @@ while True:
         page_index = pageIndex
         lock.release()
 
-        if page_index==5:
-            time.sleep(2)
+        if page_index == 5:
+            time.sleep(2.5)
             while True:
                 lock.acquire()
                 is_drawing = drawing
@@ -298,13 +369,16 @@ while True:
                     time.sleep(.1)
                     continue
             time.sleep(1)
-            os.system('systemctl poweroff')
+            if options == "Shutdown?":
+                os.system('systemctl poweroff')
+            else:
+                os.system('systemctl reboot')
             break
-        elif page_index==1:
+        elif page_index == 1:
             time.sleep(1)
         else:
             time.sleep(0.2)
     except KeyboardInterrupt:
         break
     except IOError:
-        print ("Error")
+        print("Error")
