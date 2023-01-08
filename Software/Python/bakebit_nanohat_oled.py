@@ -163,7 +163,7 @@ def draw_page():
     x = 0
     y = 0
     # Move left to right keeping track of the current x position for drawing shapes.
-    if int(time.strftime("%M")) % 3 == 0:  # oled shifts every 3 minutes
+    if int(time.strftime("%M")) % 6 < 0:  # oled shifts every 3 minutes
         x = 2
         y = 2
 
@@ -177,12 +177,12 @@ def draw_page():
 
     elif page_index == 1:
         IPAddress = get_ip()
-        if int(time.strftime("%S")) < 20:
+        if (int(time.strftime("%S"))/2) < 10:
             cmd_1min = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"
             CPU_1min = subprocess.check_output(
                 cmd_1min, shell=True).decode('utf-8')
             CPU = "CPU: %s" % str(int(float(CPU_1min)*100/4)) + "% / 1min"
-        elif int(time.strftime("%S")) < 40:
+        elif (int(time.strftime("%S"))/2) < 20:
             cmd_5min = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-1)}'"
             CPU_5min = subprocess.check_output(
                 cmd_5min, shell=True).decode('utf-8')
@@ -354,7 +354,7 @@ while True:
         lock.release()
 
         if page_index == 5:
-            time.sleep(2.5)
+            time.sleep(2)
             while True:
                 lock.acquire()
                 is_drawing = drawing
